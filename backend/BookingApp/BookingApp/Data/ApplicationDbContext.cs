@@ -11,5 +11,34 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    // Database tables will go here.
+
+    public DbSet<User> Users { get; set; } = null!;
+
+    public DbSet<Venue> Venues { get; set; } = null!;
+
+    public DbSet<Court> Courts { get; set; } = null!;
+
+    public DbSet<Booking> Bookings { get; set; } = null!;
+
+    public DbSet<OpeningHours> OpeningHours { get; set; } = null!;
+
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+
+        modelBuilder.Entity<Booking>()
+            .HasOne(b => b.User)
+            .WithMany()
+            .HasForeignKey(b => b.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+
+        modelBuilder.Entity<Booking>()
+            .HasOne(b => b.Court)
+            .WithMany(c => c.Bookings)
+            .HasForeignKey(b => b.CourtId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
 }

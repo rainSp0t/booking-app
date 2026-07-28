@@ -19,6 +19,18 @@ public class BookingsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
+        var conflictingBooking = _context.Bookings.Any(
+            b =>
+                b.CourtId == dto.CourtId &&
+                dto.StartTime < b.EndTime &&
+                dto.EndTime > b.StartTime
+        );
+
+        if (conflictingBooking)
+        {
+            return BadRequest("This time slot is already booked.");
+        }
+
         var booking = new Booking
         {
             UserId = dto.UserId,

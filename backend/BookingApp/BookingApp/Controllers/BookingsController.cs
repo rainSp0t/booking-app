@@ -2,6 +2,7 @@
 using BookingApp.DTOs.Booking;
 using BookingApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookingApp.Controllers;
 
@@ -19,7 +20,9 @@ public class BookingsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
-        var court = await _context.Courts.FindAsync(dto.CourtId);
+        var court = await _context.Courts
+            .Include(c => c.Venue)
+            .FirstOrDefaultAsync(c => c.Id == dto.CourtId);
 
         if (court == null)
         {
@@ -48,6 +51,26 @@ public class BookingsController : ControllerBase
             return BadRequest("Booking is outside venue opening hours.");
         }
 
+        var bookingDuration = dto.EndTime - dto.StartTime;
+
+        if (bookingDuration.TotalMinutes != court.Venue.BookingDurationMinutes)
+        {
+            return BadRequest("Invalid booking duration.");
+        }
+
+        // Validate booking starts on a valid time slot boundary
+        if (court.Venue.BookingDurationMinutes == 60 &&
+            dto.StartTime.Minute != 0)
+        {
+            return BadRequest("Hourly bookings must start on the hour.");
+        }
+
+        if (court.Venue.BookingDurationMinutes == 30 &&
+            dto.StartTime.Minute != 0 &&
+            dto.StartTime.Minute != 30)
+        {
+            return BadRequest("30-minute bookings must start on the hour or half hour.");
+        }
 
         var conflictingBooking = _context.Bookings.Any(
             b =>

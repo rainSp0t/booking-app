@@ -29,6 +29,7 @@ public class VenuesController : ControllerBase
             Address = dto.Address,
             ContactNumber = dto.ContactNumber,
             OwnerId = dto.OwnerId,
+            BookingDurationMinutes = dto.BookingDurationMinutes,
             CreatedAt = DateTime.UtcNow
         };
 

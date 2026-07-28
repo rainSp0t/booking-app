@@ -11,4 +11,6 @@ public class CreateVenueDto
     public string ContactNumber { get; set; } = string.Empty;
 
     public int OwnerId { get; set; }
+
+    public int BookingDurationMinutes { get; set; }
 }

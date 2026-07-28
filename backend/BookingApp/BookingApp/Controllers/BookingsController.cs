@@ -19,6 +19,36 @@ public class BookingsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
+        var court = await _context.Courts.FindAsync(dto.CourtId);
+
+        if (court == null)
+        {
+            return NotFound("Court not found.");
+        }
+
+        var openingHours = _context.OpeningHours.FirstOrDefault(
+            oh =>
+                oh.VenueId == court.VenueId &&
+                oh.DayOfWeek == dto.StartTime.DayOfWeek
+        );
+
+        if (openingHours == null)
+        {
+            return BadRequest("Venue opening hours not configured.");
+        }
+
+        if (openingHours.IsClosed)
+        {
+            return BadRequest("Venue is closed on this day.");
+        }
+
+        if (dto.StartTime.TimeOfDay < openingHours.OpenTime ||
+            dto.EndTime.TimeOfDay > openingHours.CloseTime)
+        {
+            return BadRequest("Booking is outside venue opening hours.");
+        }
+
+
         var conflictingBooking = _context.Bookings.Any(
             b =>
                 b.CourtId == dto.CourtId &&
@@ -45,6 +75,15 @@ public class BookingsController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Ok(booking);
+        return Ok(new
+        {
+            booking.Id,
+            booking.UserId,
+            booking.CourtId,
+            booking.StartTime,
+            booking.EndTime,
+            booking.Status,
+            booking.CreatedAt
+        });
     }
 }

@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
             Email = dto.Email,
 
             // Temporary
-            PasswordHash = dto.Password,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
 
             Role = dto.Role,
             CreatedDate = DateTime.UtcNow

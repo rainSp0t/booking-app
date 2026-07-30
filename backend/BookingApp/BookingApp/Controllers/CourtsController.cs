@@ -1,12 +1,14 @@
 ﻿using BookingApp.Data;
 using BookingApp.DTOs.Court;
 using BookingApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "VenueOwner")]
 public class CourtsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

@@ -1,12 +1,14 @@
 ﻿using BookingApp.Data;
 using BookingApp.DTOs.OpeningHours;
 using BookingApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "VenueOwner")]
 public class OpeningHoursController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

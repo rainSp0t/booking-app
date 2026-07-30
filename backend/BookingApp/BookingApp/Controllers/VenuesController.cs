@@ -3,11 +3,14 @@ using BookingApp.DTOs.Venue;
 using BookingApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BookingApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "VenueOwner")]
 public class VenuesController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -24,11 +27,15 @@ public class VenuesController : ControllerBase
     {
         var venue = new Venue
         {
+            OwnerId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            ),
+
             Name = dto.Name,
             Description = dto.Description,
             Address = dto.Address,
             ContactNumber = dto.ContactNumber,
-            OwnerId = dto.OwnerId,
+           
             BookingDurationMinutes = dto.BookingDurationMinutes,
             CreatedAt = DateTime.UtcNow
         };

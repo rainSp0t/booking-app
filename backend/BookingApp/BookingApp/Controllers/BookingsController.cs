@@ -1,6 +1,7 @@
 ﻿using BookingApp.Data;
 using BookingApp.DTOs.Booking;
 using BookingApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace BookingApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class BookingsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

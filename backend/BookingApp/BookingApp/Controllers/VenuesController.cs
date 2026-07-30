@@ -46,6 +46,16 @@ public class VenuesController : ControllerBase
         await _context.SaveChangesAsync();
 
 
-        return Ok(venue);
+        return Ok(new
+        {
+            venue.Id,
+            venue.OwnerId,
+            venue.Name,
+            venue.Description,
+            venue.Address,
+            venue.ContactNumber,
+            venue.BookingDurationMinutes,
+            venue.CreatedAt
+        });
     }
 }

@@ -4,6 +4,7 @@ using BookingApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookingApp.Controllers;
 
@@ -19,9 +20,14 @@ public class BookingsController : ControllerBase
         _context = context;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
+        var userId = int.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+        );
+
         var court = await _context.Courts
             .Include(c => c.Venue)
             .FirstOrDefaultAsync(c => c.Id == dto.CourtId);
@@ -47,8 +53,14 @@ public class BookingsController : ControllerBase
             return BadRequest("Venue is closed on this day.");
         }
 
+        if (dto.EndTime.Date != dto.StartTime.Date)
+        {
+            return BadRequest("Booking cannot span multiple days.");
+        }
+
+
         if (dto.StartTime.TimeOfDay < openingHours.OpenTime ||
-            dto.EndTime.TimeOfDay > openingHours.CloseTime)
+            dto.EndTime > dto.StartTime.Date.Add(openingHours.CloseTime))
         {
             return BadRequest("Booking is outside venue opening hours.");
         }
@@ -88,7 +100,7 @@ public class BookingsController : ControllerBase
 
         var booking = new Booking
         {
-            UserId = dto.UserId,
+            UserId = userId,
             CourtId = dto.CourtId,
             StartTime = dto.StartTime,
             EndTime = dto.EndTime,

@@ -3,6 +3,8 @@ using BookingApp.DTOs.OpeningHours;
 using BookingApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookingApp.Controllers;
 
@@ -22,6 +24,23 @@ public class OpeningHoursController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOpeningHours(CreateOpeningHoursDto dto)
     {
+        var userId = int.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+        );
+
+        var venue = await _context.Venues
+            .FirstOrDefaultAsync(v =>
+                v.Id == dto.VenueId &&
+                v.OwnerId == userId
+            );
+
+        if (venue == null)
+        {
+            return Unauthorized(
+                "You do not own this venue."
+            );
+        }
+
         var openingHours = new OpeningHours
         {
             VenueId = dto.VenueId,

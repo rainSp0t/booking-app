@@ -58,4 +58,68 @@ public class VenuesController : ControllerBase
             venue.CreatedAt
         });
     }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> GetVenues()
+    {
+        var venues = await _context.Venues
+            .Select(v => new VenueSummaryDto
+            {
+                Id = v.Id,
+                Name = v.Name,
+                Description = v.Description,
+                Address = v.Address,
+                BookingDurationMinutes = v.BookingDurationMinutes
+            })
+            .ToListAsync();
+
+        return Ok(venues);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetVenue(int id)
+    {
+        var venue = await _context.Venues
+            .Include(v => v.Courts)
+            .Include(v => v.OpeningHours)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
+        if (venue == null)
+        {
+            return NotFound();
+        }
+
+        var dto = new VenueDetailsDto
+        {
+            Id = venue.Id,
+            Name = venue.Name,
+            Description = venue.Description,
+            Address = venue.Address,
+            ContactNumber = venue.ContactNumber,
+            BookingDurationMinutes = venue.BookingDurationMinutes,
+
+            Courts = venue.Courts
+                .Select(c => new CourtDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description
+                })
+                .ToList(),
+
+            OpeningHours = venue.OpeningHours
+                .Select(o => new OpeningHoursDto
+                {
+                    DayOfWeek = o.DayOfWeek,
+                    OpenTime = o.OpenTime,
+                    CloseTime = o.CloseTime,
+                    IsClosed = o.IsClosed
+                })
+                .ToList()
+        };
+
+        return Ok(dto);
+    }
 }

@@ -1,10 +1,8 @@
-﻿namespace BookingApp.Models;
+﻿namespace BookingApp.DTOs.Venue;
 
-public class Venue
+public class VenueDetailsDto
 {
     public int Id { get; set; }
-
-    public int OwnerId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
@@ -16,14 +14,7 @@ public class Venue
 
     public int BookingDurationMinutes { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public List<CourtDto> Courts { get; set; } = new();
 
-
-    // Navigation Properties
-
-    public User? Owner { get; set; }
-
-    public List<Court> Courts { get; set; } = new();
-
-    public List<OpeningHours> OpeningHours { get; set; } = new();
+    public List<OpeningHoursDto> OpeningHours { get; set; } = new();
 }

@@ -66,4 +66,66 @@ public class CourtsController : ControllerBase
             court.CreatedAt
         });
     }
+
+    [HttpGet("{courtId}/availability")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAvailability(
+    int courtId,
+    DateTime date)
+    {
+        var court = await _context.Courts
+            .Include(c => c.Venue)
+            .ThenInclude(v => v.OpeningHours)
+            .Include(c => c.Bookings)
+            .FirstOrDefaultAsync(c => c.Id == courtId);
+
+        if (court == null)
+        {
+            return NotFound();
+        }
+
+        var openingHours = court.Venue?.OpeningHours
+            .FirstOrDefault(o => o.DayOfWeek == date.DayOfWeek);
+
+        if (openingHours == null)
+        {
+            return BadRequest("Opening hours are not configured for this day.");
+        }
+
+        if (openingHours.IsClosed)
+        {
+            return BadRequest("Venue is closed on this day.");
+        }
+
+        var currentSlot = date.Date + openingHours.OpenTime;
+
+        var closingTime = date.Date + openingHours.CloseTime;
+
+        var slotDuration = TimeSpan.FromMinutes(
+            court.Venue!.BookingDurationMinutes
+        );
+
+        var slots = new List<AvailabilitySlotDto>();
+
+        while (currentSlot + slotDuration <= closingTime)
+        {
+            var slotEnd = currentSlot + slotDuration;
+
+            var booked = court.Bookings.Any(b =>
+                currentSlot < b.EndTime &&
+                slotEnd > b.StartTime
+            );
+
+            slots.Add(new AvailabilitySlotDto
+            {
+                StartTime = currentSlot,
+                EndTime = slotEnd,
+                Available = !booked
+            });
+
+            currentSlot = slotEnd;
+        }
+
+        return Ok(slots);
+    }
 }

@@ -20,7 +20,6 @@ public class BookingsController : ControllerBase
         _context = context;
     }
 
-    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
@@ -123,4 +122,33 @@ public class BookingsController : ControllerBase
             booking.CreatedAt
         });
     }
+
+
+    [HttpGet("my-bookings")]
+    public async Task<IActionResult> GetMyBookings()
+    {
+        var userId = int.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+        );
+
+        var bookings = await _context.Bookings
+            .Include(b => b.Court)
+                .ThenInclude(c => c.Venue)
+            .Where(b => b.UserId == userId)
+            .OrderBy(b => b.StartTime)
+            .ToListAsync();
+
+        var result = bookings.Select(b => new BookingSummaryDto
+        {
+            Id = b.Id,
+            VenueName = b.Court.Venue.Name,
+            CourtName = b.Court.Name,
+            StartTime = b.StartTime,
+            EndTime = b.EndTime,
+            Status = b.Status
+        });
+
+        return Ok(result);
+    }
+
 }

@@ -151,4 +151,45 @@ public class BookingsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPatch("{bookingId}/cancel")]
+    public async Task<IActionResult> CancelBooking(int bookingId)
+    {
+        var userId = int.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+        );
+
+        var booking = await _context.Bookings
+            .FirstOrDefaultAsync(b => b.Id == bookingId);
+
+        if (booking == null)
+        {
+            return NotFound("Booking not found.");
+        }
+
+        if (booking.UserId != userId)
+        {
+            return Forbid();
+        }
+
+        if (booking.Status == "Cancelled")
+        {
+            return BadRequest("Booking is already cancelled.");
+        }
+
+        if (booking.StartTime <= DateTime.UtcNow)
+        {
+            return BadRequest(
+                "Cannot cancel a booking that has already started."
+            );
+        }
+
+        booking.Status = "Cancelled";
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            Message = "Booking cancelled successfully."
+        });
+    }
+
 }

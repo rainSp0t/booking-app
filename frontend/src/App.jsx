@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import MyBookings from "./pages/MyBookings";
 import MainLayout from "./layouts/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     return (
@@ -13,6 +15,13 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+
+                    <Route element={<ProtectedRoute />}>
+                        <Route
+                            path="/my-bookings"
+                            element={<MyBookings />}
+                        />
+                    </Route>
                 </Route>
             </Routes>
         </BrowserRouter>

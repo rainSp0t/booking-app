@@ -9,3 +9,17 @@ export async function createBooking(courtId, startTime, endTime) {
 
     return response.data;
 }
+
+export async function getMyBookings() {
+    const response = await apiClient.get("/bookings/my-bookings");
+
+    return response.data;
+}
+
+export async function cancelBooking(bookingId) {
+    const response = await apiClient.patch(
+        `/bookings/${bookingId}/cancel`
+    );
+
+    return response.data;
+}

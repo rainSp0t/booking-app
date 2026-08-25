@@ -59,6 +59,28 @@ public class VenuesController : ControllerBase
         });
     }
 
+    [HttpGet("my-venues")]
+    public async Task<IActionResult> GetMyVenues()
+    {
+        var userId = int.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+        );
+
+        var venues = await _context.Venues
+            .Where(v => v.OwnerId == userId)
+            .Select(v => new VenueSummaryDto
+            {
+                Id = v.Id,
+                Name = v.Name,
+                Description = v.Description,
+                Address = v.Address,
+                BookingDurationMinutes = v.BookingDurationMinutes
+            })
+            .ToListAsync();
+
+        return Ok(venues);
+    }
+
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetVenues()

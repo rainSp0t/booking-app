@@ -7,6 +7,7 @@ import MyBookings from "./pages/MyBookings";
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import VenueDetails from "./pages/VenueDetails";
+import VenueOwnerDashboard from "./pages/VenueOwnerDashboard";
 
 function App() {
     return (
@@ -24,6 +25,17 @@ function App() {
                         element={<MyBookings />}
                     />
                     </Route>
+                </Route>
+
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/my-bookings" element={<MyBookings />} />
+                </Route>
+
+                <Route element={<ProtectedRoute requiredRole="VenueOwner" />}>
+                    <Route
+                        path="/venue-owner"
+                        element={<VenueOwnerDashboard />}
+                    />
                 </Route>
             </Routes>
         </BrowserRouter>

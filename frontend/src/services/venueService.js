@@ -24,3 +24,9 @@ export async function getCourtAvailability(courtId, date) {
 
     return response.data;
 }
+
+export async function getMyVenues() {
+    const response = await apiClient.get("/venues/my-venues");
+
+    return response.data;
+}

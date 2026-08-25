@@ -4,6 +4,8 @@ import {
     getVenueById,
     getCourtAvailability
 } from "../services/venueService";
+import { createBooking } from "../services/bookingService";
+import { useAuth } from "../context/AuthContext";
 
 export default function VenueDetails() {
     const { id } = useParams();
@@ -14,6 +16,13 @@ export default function VenueDetails() {
     const [selectedCourt, setSelectedCourt] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
     const [availability, setAvailability] = useState([]);
+
+    const [selectedSlot, setSelectedSlot] = useState(null);
+    const { isAuthenticated } = useAuth();
+
+    const [bookingError, setBookingError] = useState("");
+    const [bookingSuccess, setBookingSuccess] = useState("");
+    const [isBooking, setIsBooking] = useState(false);
 
     useEffect(() => {
         async function loadVenue() {
@@ -60,6 +69,52 @@ export default function VenueDetails() {
     }, [selectedCourt, selectedDate]);
 
 
+
+    async function handleBooking() {
+        if (!selectedSlot || !selectedCourt) {
+            return;
+        }
+
+        if (!isAuthenticated) {
+            setBookingError("You must be logged in to make a booking.");
+            return;
+        }
+
+        setBookingError("");
+        setBookingSuccess("");
+        setIsBooking(true);
+
+        try {
+            await createBooking(
+                selectedCourt,
+                selectedSlot.startTime,
+                selectedSlot.endTime
+            );
+
+            setBookingSuccess("Booking created successfully.");
+            setSelectedSlot(null);
+
+            // Refresh availability so the newly booked slot
+            // becomes unavailable.
+            const updatedAvailability = await getCourtAvailability(
+                selectedCourt,
+                selectedDate
+            );
+
+            setAvailability(updatedAvailability);
+        } catch (error) {
+            console.error("Failed to create booking:", error);
+
+            setBookingError(
+                error.response?.data || "Failed to create booking."
+            );
+        } finally {
+            setIsBooking(false);
+        }
+    }
+
+
+
     if (error) {
         return <p>{error}</p>;
     }
@@ -100,6 +155,8 @@ export default function VenueDetails() {
                                 ? Number(event.target.value)
                                 : null
                         );
+
+                        setSelectedSlot(null);
                     }}
                 >
                     <option value="">Select a court</option>
@@ -121,6 +178,7 @@ export default function VenueDetails() {
                     value={selectedDate}
                     onChange={(event) => {
                         setSelectedDate(event.target.value);
+                        setSelectedSlot(null);
                     }}
                 />
             </div>
@@ -150,15 +208,49 @@ export default function VenueDetails() {
                                 )}
                             </span>
 
-                            <span>
-                                {slot.available
-                                    ? " Available"
-                                    : " Booked"}
-                            </span>
+                            {slot.available ? (
+                                <button
+                                    onClick={() => setSelectedSlot(slot)}
+                                >
+                                    Book
+                                </button>
+                            ) : (
+                                <span> Booked</span>
+                            )}
                         </div>
                     ))}
                 </div>
             )}
+
+
+            {selectedSlot && (
+                <div>
+                    <h3>Selected Booking</h3>
+
+                    <p>
+                        {new Date(selectedSlot.startTime).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        })}
+                        {" - "}
+                        {new Date(selectedSlot.endTime).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        })}
+                    </p>
+
+                    <button
+                        onClick={handleBooking}
+                        disabled={isBooking}
+                    >
+                        {isBooking ? "Booking..." : "Confirm Booking"}
+                    </button>
+                </div>
+            )}
+
+            {bookingError && <p>{bookingError}</p>}
+
+            {bookingSuccess && <p>{bookingSuccess}</p>}
 
 
             <h2>Opening Hours</h2>

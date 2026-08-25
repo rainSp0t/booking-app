@@ -24,6 +24,11 @@ public class OpeningHoursController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOpeningHours(CreateOpeningHoursDto dto)
     {
+        if (!Enum.IsDefined(typeof(DayOfWeek), dto.DayOfWeek))
+        {
+            return BadRequest("Invalid day of week.");
+        }
+
         var userId = int.Parse(
             User.FindFirst(ClaimTypes.NameIdentifier)!.Value
         );
@@ -56,6 +61,14 @@ public class OpeningHoursController : ControllerBase
         await _context.SaveChangesAsync();
 
 
-        return Ok(openingHours);
+        return Ok(new
+        {
+            openingHours.Id,
+            openingHours.VenueId,
+            openingHours.DayOfWeek,
+            openingHours.OpenTime,
+            openingHours.CloseTime,
+            openingHours.IsClosed
+        });
     }
 }

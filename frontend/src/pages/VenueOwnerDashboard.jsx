@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMyVenues } from "../services/venueService";
+import { Link } from "react-router-dom";
 
 export default function VenueOwnerDashboard() {
     const [venues, setVenues] = useState([]);
@@ -27,6 +28,9 @@ export default function VenueOwnerDashboard() {
 
     return (
         <div>
+            <Link to="/venue-owner/venues/create">
+                Create Venue
+            </Link>
             <h1>My Venues</h1>
 
             {venues.length === 0 ? (

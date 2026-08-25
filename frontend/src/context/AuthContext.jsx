@@ -12,10 +12,16 @@ function getRoleFromToken(token) {
             atob(token.split(".")[1])
         );
 
-        return payload[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ] ?? null;
-    } catch {
+        const role =
+            payload[
+                "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+            ];
+
+        console.log("Extracted role:", role);
+
+        return role ?? null;
+    } catch (error) {
+        console.error("Failed to decode token:", error);
         return null;
     }
 }
@@ -44,6 +50,7 @@ export function AuthProvider({ children }) {
         <AuthContext.Provider
             value={{
                 token,
+                role,
                 isAuthenticated,
                 loginUser,
                 logout

@@ -30,3 +30,9 @@ export async function getMyVenues() {
 
     return response.data;
 }
+
+export async function createVenue(venueData) {
+    const response = await apiClient.post("/venues", venueData);
+
+    return response.data;
+}

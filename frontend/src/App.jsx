@@ -8,6 +8,7 @@ import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import VenueDetails from "./pages/VenueDetails";
 import VenueOwnerDashboard from "./pages/VenueOwnerDashboard";
+import CreateVenue from "./pages/CreateVenue";
 
 function App() {
     return (
@@ -35,6 +36,18 @@ function App() {
                     <Route
                         path="/venue-owner"
                         element={<VenueOwnerDashboard />}
+                    />
+                </Route>
+
+                <Route element={<ProtectedRoute requiredRole="VenueOwner" />}>
+                    <Route
+                        path="/venue-owner"
+                        element={<VenueOwnerDashboard />}
+                    />
+
+                    <Route
+                        path="/venue-owner/venues/create"
+                        element={<CreateVenue />}
                     />
                 </Route>
             </Routes>

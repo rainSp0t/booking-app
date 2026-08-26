@@ -42,3 +42,39 @@ export async function createCourt(courtData) {
 
     return response.data;
 }
+
+
+
+export async function createOpeningHours(openingHoursData) {
+    const response = await apiClient.post(
+        "/OpeningHours",
+        openingHoursData
+    );
+
+    return response.data;
+}
+
+export async function getOpeningHours(venueId) {
+    const response = await apiClient.get(
+        `/OpeningHours/venue/${venueId}`
+    );
+
+    return response.data;
+}
+
+export async function updateOpeningHours(id, openingHoursData) {
+    const response = await apiClient.put(
+        `/OpeningHours/${id}`,
+        openingHoursData
+    );
+
+    return response.data;
+}
+
+export async function deleteOpeningHours(id) {
+    const response = await apiClient.delete(
+        `/OpeningHours/${id}`
+    );
+
+    return response.data;
+}

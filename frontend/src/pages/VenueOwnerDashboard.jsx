@@ -54,6 +54,12 @@ export default function VenueOwnerDashboard() {
                         >
                             Manage Courts
                         </Link>
+
+                        <Link
+                            to={`/venue-owner/venues/${venue.id}/opening-hours`}
+                        >
+                            Manage Opening Hours
+                        </Link>
                     </div>
                 ))
             )}

@@ -1,29 +1,76 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, role, logout } = useAuth();
+
+    function getNavClass({ isActive }) {
+        return isActive
+            ? "sidebar-link active"
+            : "sidebar-link";
+    }
 
     return (
-        <nav>
-            <Link to="/">Booking App</Link>
+        <aside className="sidebar">
+            <div className="sidebar-brand">
+                <NavLink to="/">
+                    Booking App
+                </NavLink>
+            </div>
 
-            <div>
-                {!isAuthenticated ? (
-                    <>
-                        <Link to="/login">Login</Link>
-                        <Link to="/register">Register</Link>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/my-bookings">My Bookings</Link>
+            <nav className="sidebar-nav">
+                <NavLink to="/" className={getNavClass}>
+                    Home
+                </NavLink>
 
-                        <button onClick={logout}>
-                            Logout
-                        </button>
+                {isAuthenticated && (
+                    <NavLink
+                        to="/my-bookings"
+                        className={getNavClass}
+                    >
+                        My Bookings
+                    </NavLink>
+                )}
+
+                {isAuthenticated && role === "VenueOwner" && (
+                    <>
+                        <div className="sidebar-section-title">
+                            Venue Management
+                        </div>
+
+                        <NavLink
+                            to="/venue-owner"
+                            className={getNavClass}
+                        >
+                            My Venues
+                        </NavLink>
                     </>
                 )}
+            </nav>
+
+            <div className="sidebar-bottom">
+                {!isAuthenticated ? (
+                    <>
+                        <NavLink
+                            to="/login"
+                            className={getNavClass}
+                        >
+                            Login
+                        </NavLink>
+
+                        <NavLink
+                            to="/register"
+                            className={getNavClass}
+                        >
+                            Register
+                        </NavLink>
+                    </>
+                ) : (
+                    <button type="button" onClick={logout}>
+                        Logout
+                    </button>
+                )}
             </div>
-        </nav>
+        </aside>
     );
 }

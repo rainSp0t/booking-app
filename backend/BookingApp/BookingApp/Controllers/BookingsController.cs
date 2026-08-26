@@ -192,4 +192,43 @@ public class BookingsController : ControllerBase
         });
     }
 
+    [HttpGet("venue/{venueId}")]
+    [Authorize(Roles = "VenueOwner")]
+    public async Task<IActionResult> GetVenueBookings(int venueId)
+    {
+        var userId = int.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+        );
+
+        var venue = await _context.Venues
+            .FirstOrDefaultAsync(v =>
+                v.Id == venueId &&
+                v.OwnerId == userId
+            );
+
+        if (venue == null)
+        {
+            return Unauthorized(
+                "You do not own this venue."
+            );
+        }
+
+        var bookings = await _context.Bookings
+            .Include(b => b.Court)
+            .Where(b => b.Court.VenueId == venueId)
+            .OrderBy(b => b.StartTime)
+            .Select(b => new BookingSummaryDto
+            {
+                Id = b.Id,
+                VenueName = venue.Name,
+                CourtName = b.Court.Name,
+                StartTime = b.StartTime,
+                EndTime = b.EndTime,
+                Status = b.Status
+            })
+            .ToListAsync();
+
+        return Ok(bookings);
+    }
+
 }

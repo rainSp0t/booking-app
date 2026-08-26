@@ -11,6 +11,7 @@ import VenueOwnerDashboard from "./pages/VenueOwnerDashboard";
 import CreateVenue from "./pages/CreateVenue";
 import ManageVenueCourts from "./pages/ManageVenueCourts";
 import ManageOpeningHours from "./pages/ManageOpeningHours";
+import ManageVenueBookings from "./pages/ManageVenueBookings";
 
 function App() {
     return (
@@ -48,6 +49,11 @@ function App() {
                         <Route
                             path="/venue-owner/venues/:id/opening-hours"
                             element={<ManageOpeningHours />}
+                        />
+
+                        <Route
+                            path="/venue-owner/venues/:id/bookings"
+                            element={<ManageVenueBookings />}
                         />
                     </Route>
                 </Route>

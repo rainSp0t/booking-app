@@ -23,3 +23,11 @@ export async function cancelBooking(bookingId) {
 
     return response.data;
 }
+
+export async function getVenueBookings(venueId) {
+    const response = await apiClient.get(
+        `/bookings/venue/${venueId}`
+    );
+
+    return response.data;
+}

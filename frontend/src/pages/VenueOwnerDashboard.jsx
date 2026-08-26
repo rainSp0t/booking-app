@@ -60,6 +60,12 @@ export default function VenueOwnerDashboard() {
                         >
                             Manage Opening Hours
                         </Link>
+
+                        <Link
+                            to={`/venue-owner/venues/${venue.id}/bookings`}
+                        >
+                            Manage Bookings
+                        </Link>
                     </div>
                 ))
             )}

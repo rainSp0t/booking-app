@@ -10,11 +10,9 @@ export default function Home() {
         async function loadVenues() {
             try {
                 const data = await getVenues();
-
                 setVenues(data);
             } catch (error) {
                 console.error("Failed to load venues:", error);
-
                 setError("Failed to load venues.");
             }
         }
@@ -23,17 +21,32 @@ export default function Home() {
     }, []);
 
     return (
-        <div>
-            <h1>Venues</h1>
+        <div className="home-page">
+            <header className="page-header">
+                <h1>Find a venue</h1>
+                <p>
+                    Browse local courts and find a time that works for you.
+                </p>
+            </header>
 
-            {error && <p>{error}</p>}
+            {error && (
+                <p className="error-message">
+                    {error}
+                </p>
+            )}
 
-            {venues.map((venue) => (
-                <VenueCard
-                    key={venue.id}
-                    venue={venue}
-                />
-            ))}
+            {venues.length === 0 && !error ? (
+                <p>No venues are currently available.</p>
+            ) : (
+                <div className="venue-grid">
+                    {venues.map((venue) => (
+                        <VenueCard
+                            key={venue.id}
+                            venue={venue}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

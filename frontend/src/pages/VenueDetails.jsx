@@ -6,6 +6,9 @@ import {
 } from "../services/venueService";
 import { createBooking } from "../services/bookingService";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import BookingCalendar from "../components/BookingCalendar";
+
 
 export default function VenueDetails() {
     const { id } = useParams();
@@ -23,6 +26,8 @@ export default function VenueDetails() {
     const [bookingError, setBookingError] = useState("");
     const [bookingSuccess, setBookingSuccess] = useState("");
     const [isBooking, setIsBooking] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadVenue() {
@@ -67,6 +72,19 @@ export default function VenueDetails() {
 
         loadAvailability();
     }, [selectedCourt, selectedDate]);
+
+
+    useEffect(() => {
+        if (!bookingSuccess) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setBookingSuccess("");
+        }, 4000);
+
+        return () => clearTimeout(timer);
+    }, [bookingSuccess]);
 
 
 
@@ -123,148 +141,252 @@ export default function VenueDetails() {
         return <p>Loading...</p>;
     }
 
+    const orderedOpeningHours = [...venue.openingHours].sort(
+        (a, b) => {
+            const dayA = a.dayOfWeek === 0 ? 7 : a.dayOfWeek;
+            const dayB = b.dayOfWeek === 0 ? 7 : b.dayOfWeek;
+
+            return dayA - dayB;
+        }
+    );
+
     return (
-        <div>
-            <h1>{venue.name}</h1>
+        <div className="venue-details-page">
+            <button
+                type="button"
+                className="back-button"
+                onClick={() => navigate("/")}
+            >
+                ← Back to venues
+            </button>
 
-            <p>{venue.description}</p>
-            <p>{venue.address}</p>
-            <p>{venue.contactNumber}</p>
+            <header className="venue-details-header">
+                <h1>{venue.name}</h1>
 
-            <h2>Courts</h2>
+                <p className="venue-details-description">
+                    {venue.description}
+                </p>
 
-            {venue.courts.map((court) => (
-                <div key={court.id}>
-                    <h3>{court.name}</h3>
-                    <p>{court.description}</p>
-                </div>
-            ))}
+                <p className="venue-details-address">
+                    {venue.address}
+                </p>
 
+                <p className="venue-details-contact">
+                    {venue.contactNumber}
+                </p>
+            </header>
 
-            <h2>Check Availability</h2>
+            <section className="venue-section">
+                <h2>Courts</h2>
 
-            <div>
-                <label htmlFor="court">Court</label>
-
-                <select
-                    id="court"
-                    value={selectedCourt ?? ""}
-                    onChange={(event) => {
-                        setSelectedCourt(
-                            event.target.value
-                                ? Number(event.target.value)
-                                : null
-                        );
-
-                        setSelectedSlot(null);
-                    }}
-                >
-                    <option value="">Select a court</option>
-
+                <div className="court-list">
                     {venue.courts.map((court) => (
-                        <option key={court.id} value={court.id}>
-                            {court.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
+                        <div
+                            key={court.id}
+                            className={
+                                selectedCourt === court.id
+                                    ? "court-card selected"
+                                    : "court-card"
+                            }
+                        >
+                            <h3>{court.name}</h3>
 
-            <div>
-                <label htmlFor="date">Date</label>
+                            <p>{court.description}</p>
 
-                <input
-                    id="date"
-                    type="date"
-                    value={selectedDate}
-                    onChange={(event) => {
-                        setSelectedDate(event.target.value);
-                        setSelectedSlot(null);
-                    }}
-                />
-            </div>
-
-
-            {availability.length > 0 && (
-                <div>
-                    <h3>Available Times</h3>
-
-                    {availability.map((slot) => (
-                        <div key={slot.startTime}>
-                            <span>
-                                {new Date(slot.startTime).toLocaleTimeString(
-                                    [],
-                                    {
-                                        hour: "2-digit",
-                                        minute: "2-digit"
-                                    }
-                                )}
-                                {" - "}
-                                {new Date(slot.endTime).toLocaleTimeString(
-                                    [],
-                                    {
-                                        hour: "2-digit",
-                                        minute: "2-digit"
-                                    }
-                                )}
-                            </span>
-
-                            {slot.available ? (
-                                <button
-                                    onClick={() => setSelectedSlot(slot)}
-                                >
-                                    Book
-                                </button>
-                            ) : (
-                                <span> Booked</span>
-                            )}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSelectedCourt(court.id);
+                                    setSelectedSlot(null);
+                                }}
+                            >
+                                {selectedCourt === court.id
+                                    ? "Selected"
+                                    : "Select Court"}
+                            </button>
                         </div>
                     ))}
                 </div>
-            )}
+            </section>
 
+            <section className="venue-section booking-section">
+                <h2>Check Availability</h2>
 
-            {selectedSlot && (
-                <div>
-                    <h3>Selected Booking</h3>
+                <div className="booking-calendar-section">
+                    <h3>Select a date</h3>
 
-                    <p>
-                        {new Date(selectedSlot.startTime).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        })}
-                        {" - "}
-                        {new Date(selectedSlot.endTime).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        })}
+                    <BookingCalendar
+                        openingHours={venue.openingHours}
+                        selectedDate={selectedDate}
+                        onDateSelect={(date) => {
+                            setSelectedDate(date);
+                            setSelectedSlot(null);
+                        }}
+                    />
+                </div>
+
+                {selectedCourt && selectedDate && (
+                    <div className="availability-section">
+                        <h3>Available Times</h3>
+
+                        {availability.length === 0 ? (
+                            <p className="empty-message">
+                                No availability found for this date.
+                            </p>
+                        ) : (
+                            <div className="availability-grid">
+                                {availability.map((slot) => {
+                                    const start = new Date(
+                                        slot.startTime
+                                    ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                    });
+
+                                    const end = new Date(
+                                        slot.endTime
+                                    ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                    });
+
+                                    const isSelected =
+                                        selectedSlot?.startTime === slot.startTime;
+
+                                    return (
+                                        <button
+                                            key={slot.startTime}
+                                            type="button"
+                                            className={`availability-slot ${
+                                                slot.available
+                                                    ? "available"
+                                                    : "booked"
+                                            } ${isSelected ? "selected" : ""}`}
+                                            disabled={!slot.available}
+                                            onClick={() => setSelectedSlot(slot)}
+                                        >
+                                            <span className="slot-time">
+                                                {start}
+                                            </span>
+
+                                            <span className="slot-end">
+                                                {end}
+                                            </span>
+
+                                            <span className="slot-status">
+                                                {slot.available
+                                                    ? isSelected
+                                                        ? "Selected"
+                                                        : "Available"
+                                                    : "Booked"}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {selectedSlot && (
+                    <div className="booking-summary">
+                        <h3>Selected Booking</h3>
+
+                        <p>
+                            {new Date(
+                                selectedSlot.startTime
+                            ).toLocaleDateString()}
+                        </p>
+
+                        <p>
+                            {new Date(
+                                selectedSlot.startTime
+                            ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })}
+                            {" - "}
+                            {new Date(
+                                selectedSlot.endTime
+                            ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })}
+                        </p>
+
+                        <button
+                            type="button"
+                            onClick={handleBooking}
+                            disabled={isBooking}
+                        >
+                            {isBooking
+                                ? "Booking..."
+                                : "Confirm Booking"}
+                        </button>
+                    </div>
+                )}
+
+                {bookingError && (
+                    <p className="error-message">
+                        {bookingError}
                     </p>
+                )}
 
-                    <button
-                        onClick={handleBooking}
-                        disabled={isBooking}
-                    >
-                        {isBooking ? "Booking..." : "Confirm Booking"}
-                    </button>
+                
+            </section>
+
+            <section className="venue-section opening-hours-section">
+                <div className="section-header">
+                    <div>
+                        <h2>Opening Hours</h2>
+                        <p>Venue operating hours</p>
+                    </div>
+                </div>
+
+                <div className="opening-hours-list">
+                    {orderedOpeningHours.map((hours) => {
+                        const day = [
+                            "Sunday",
+                            "Monday",
+                            "Tuesday",
+                            "Wednesday",
+                            "Thursday",
+                            "Friday",
+                            "Saturday"
+                        ][hours.dayOfWeek];
+
+                        return (
+                            <div
+                                key={hours.dayOfWeek}
+                                className="opening-hours-row"
+                            >
+                                <span className="opening-hours-day">
+                                    {day}
+                                </span>
+
+                                <span
+                                    className={
+                                        hours.isClosed
+                                            ? "opening-hours-time closed"
+                                            : "opening-hours-time"
+                                    }
+                                >
+                                    {hours.isClosed
+                                        ? "Closed"
+                                        : `${hours.openTime.slice(0, 5)} – ${hours.closeTime.slice(0, 5)}`}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+
+            {bookingSuccess && (
+                <div className="success-toast" role="status">
+                    <span>✓</span>
+                    <span>{bookingSuccess}</span>
                 </div>
             )}
-
-            {bookingError && <p>{bookingError}</p>}
-
-            {bookingSuccess && <p>{bookingSuccess}</p>}
-
-
-            <h2>Opening Hours</h2>
-
-            {venue.openingHours.map((hours) => (
-                <div key={hours.dayOfWeek}>
-                    <p>
-                        {hours.dayOfWeek}:{" "}
-                        {hours.isClosed
-                            ? "Closed"
-                            : `${hours.openTime} - ${hours.closeTime}`}
-                    </p>
-                </div>
-            ))}
         </div>
-    );
+    ); 
 }

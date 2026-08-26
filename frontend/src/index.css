@@ -184,13 +184,14 @@ a {
 
     min-height: 100vh;
 
-    padding: 40px;
+    padding: 48px;
 }
 
 /* General page styling */
 
 .main-content > div {
-    max-width: 1100px;
+    width: 100%;
+    max-width: 1280px;
     margin: 0 auto;
 }
 
@@ -331,5 +332,634 @@ p {
 @media (max-width: 900px) {
     .venue-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+
+
+.venue-details-page {
+    text-align: left;
+}
+
+.back-button {
+    margin-bottom: 24px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-h);
+}
+
+.venue-details-header {
+    margin-bottom: 40px;
+}
+
+.venue-details-header h1 {
+    margin-bottom: 8px;
+}
+
+.venue-details-description,
+.venue-details-address,
+.venue-details-contact {
+    color: var(--text);
+}
+
+.venue-section {
+    margin-bottom: 40px;
+}
+
+.court-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.court-card {
+    padding: 20px;
+
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+
+    transition:
+        border-color 0.2s,
+        background-color 0.2s;
+}
+
+.court-card:hover {
+    border-color: #c4b5fd;
+}
+
+.court-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+}
+
+.court-card h3 {
+    margin: 0 0 8px;
+}
+
+.court-card p {
+    margin-bottom: 20px;
+    color: var(--text);
+}
+
+.court-card button {
+    padding: 9px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: var(--accent);
+    color: white;
+
+    font-weight: 600;
+}
+
+.booking-controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field input {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-h);
+}
+
+
+
+
+
+
+.availability-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.availability-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+
+    min-height: 96px;
+    padding: 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--surface);
+    color: var(--text-h);
+
+    text-align: left;
+
+    transition:
+        border-color 0.2s,
+        background-color 0.2s,
+        transform 0.2s;
+}
+
+.availability-slot.available {
+    cursor: pointer;
+}
+
+.availability-slot.available:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.availability-slot.booked {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.availability-slot.selected {
+    border: 2px solid var(--accent);
+    background: var(--accent-bg);
+}
+
+.slot-time {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-h);
+}
+
+.slot-end {
+    font-size: 14px;
+    color: var(--text);
+}
+
+.slot-status {
+    margin-top: auto;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.availability-slot.available .slot-status {
+    color: var(--accent);
+}
+
+.availability-slot.booked .slot-status {
+    color: #9ca3af;
+}
+
+.availability-slot.selected .slot-status {
+    color: var(--accent);
+}
+
+
+.availability-slot.booked .slot-time {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.availability-slot.booked .slot-end {
+    color: #9ca3af;
+}
+
+.availability-slot.booked .slot-status {
+    color: #9ca3af;
+}
+
+@media (max-width: 900px) {
+    .availability-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .availability-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+
+
+
+
+
+
+
+
+.booking-calendar-section {
+    margin-bottom: 32px;
+}
+
+.booking-calendar {
+    width: 100%;
+    max-width: none;
+
+    padding: 28px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    box-shadow: var(--shadow);
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.calendar-header h3 {
+    margin: 0;
+    text-align: center;
+}
+
+.calendar-header button {
+    width: 36px;
+    height: 36px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--surface);
+    color: var(--text-h);
+}
+
+.calendar-header button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.calendar-weekdays,
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.calendar-weekdays {
+    margin-bottom: 6px;
+}
+
+.calendar-weekdays div {
+    padding: 8px;
+
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+
+    text-align: center;
+}
+
+.calendar-empty {
+    min-height: 82px;
+}
+
+.calendar-day {
+    min-height: 82px;
+
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--surface);
+    color: var(--text-h);
+
+    text-align: left;
+}
+
+.calendar-day.available {
+    cursor: pointer;
+}
+
+.calendar-day.available:hover {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+}
+
+.calendar-day.selected {
+    border: 2px solid var(--accent);
+    background: var(--accent-bg);
+}
+
+.calendar-day.closed,
+.calendar-day.unconfigured,
+.calendar-day.past {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.calendar-day-number {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.calendar-day-status {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.calendar-day.available .calendar-day-status {
+    color: var(--accent);
+}
+
+@media (max-width: 650px) {
+    .booking-calendar {
+        padding: 12px;
+    }
+
+    .calendar-weekdays,
+    .calendar-grid {
+        gap: 3px;
+    }
+
+    .calendar-day {
+        min-height: 65px;
+        padding: 7px;
+    }
+
+    .calendar-day-number {
+        font-size: 15px;
+    }
+
+    .calendar-day-status {
+        font-size: 9px;
+    }
+}
+
+
+
+.booking-summary {
+    margin-top: 24px;
+    padding: 24px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #111827;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.booking-summary h3 {
+    margin-top: 0;
+    color: #111827;
+}
+
+.booking-summary p {
+    color: #4b5563;
+}
+
+.booking-summary button {
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: var(--accent);
+    color: #ffffff;
+
+    font-weight: 700;
+
+    transition: opacity 0.2s;
+}
+
+.booking-summary button:hover {
+    opacity: 0.9;
+}
+
+.booking-summary button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.success-toast {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px 18px;
+
+    background: #ffffff;
+    color: #111827;
+
+    border: 1px solid #d1d5db;
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    font-size: 14px;
+    font-weight: 600;
+
+    z-index: 1000;
+}
+
+.success-toast span:first-child {
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    .success-toast {
+        right: 16px;
+        left: 16px;
+        bottom: 16px;
+    }
+}
+
+
+
+.opening-hours-section {
+    margin-bottom: 32px;
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin-bottom: 4px;
+}
+
+.section-header p {
+    color: var(--text);
+    font-size: 14px;
+}
+
+.opening-hours-list {
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--surface);
+}
+
+.opening-hours-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+
+    padding: 15px 20px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.opening-hours-row:last-child {
+    border-bottom: none;
+}
+
+.opening-hours-day {
+    font-weight: 600;
+    color: var(--text-h);
+}
+
+.opening-hours-time {
+    color: var(--text);
+    text-align: right;
+}
+
+.opening-hours-time.closed {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+@media (max-width: 600px) {
+    .opening-hours-row {
+        padding: 13px 16px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+.venue-details-page {
+    text-align: left;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.venue-details-header {
+    padding: 32px;
+    margin-bottom: 32px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    box-shadow: var(--shadow);
+}
+
+.venue-details-header h1 {
+    margin: 0 0 12px;
+    font-size: 38px;
+}
+
+.venue-details-description {
+    max-width: 750px;
+    margin-bottom: 16px;
+    font-size: 17px;
+}
+
+.venue-section {
+    margin-bottom: 32px;
+    padding: 28px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    box-shadow: var(--shadow);
+}
+
+.venue-section > h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+
+@media (max-width: 900px) {
+    .main-content {
+        padding: 28px;
+    }
+
+    .court-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .availability-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .calendar-day {
+        min-height: 95px;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .main-content {
+        margin-left: 200px;
+        padding: 20px;
+    }
+
+    .venue-details-header,
+    .venue-section {
+        padding: 20px;
+    }
+
+    .court-list {
+        grid-template-columns: 1fr;
+    }
+
+    .availability-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .calendar-day {
+        min-height: 75px;
+        padding: 8px;
+    }
+
+    .calendar-day-status {
+        font-size: 10px;
     }
 }

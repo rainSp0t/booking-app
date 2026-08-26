@@ -12,6 +12,7 @@ import CreateVenue from "./pages/CreateVenue";
 import ManageVenueCourts from "./pages/ManageVenueCourts";
 import ManageOpeningHours from "./pages/ManageOpeningHours";
 import ManageVenueBookings from "./pages/ManageVenueBookings";
+import OwnedVenueRoute from "./components/OwnedVenueRoute";
 
 function App() {
     return (
@@ -41,20 +42,22 @@ function App() {
                             element={<CreateVenue />}
                         />
 
-                        <Route
-                            path="/venue-owner/venues/:id/courts"
-                            element={<ManageVenueCourts />}
-                        />
+                        <Route element={<OwnedVenueRoute />}>
+                            <Route
+                                path="/venue-owner/venues/:id/courts"
+                                element={<ManageVenueCourts />}
+                            />
 
-                        <Route
-                            path="/venue-owner/venues/:id/opening-hours"
-                            element={<ManageOpeningHours />}
-                        />
+                            <Route
+                                path="/venue-owner/venues/:id/opening-hours"
+                                element={<ManageOpeningHours />}
+                            />
 
-                        <Route
-                            path="/venue-owner/venues/:id/bookings"
-                            element={<ManageVenueBookings />}
-                        />
+                            <Route
+                                path="/venue-owner/venues/:id/bookings"
+                                element={<ManageVenueBookings />}
+                            />
+                        </Route>
                     </Route>
                 </Route>
             </Routes>

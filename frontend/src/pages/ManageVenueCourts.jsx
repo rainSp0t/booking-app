@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    getVenueById,
-    createCourt
-} from "../services/venueService";
+import { getVenueById, getMyVenues, createCourt } from "../services/venueService";
 
 export default function ManageVenueCourts() {
     const { id } = useParams();

@@ -9,46 +9,39 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import VenueDetails from "./pages/VenueDetails";
 import VenueOwnerDashboard from "./pages/VenueOwnerDashboard";
 import CreateVenue from "./pages/CreateVenue";
+import ManageVenueCourts from "./pages/ManageVenueCourts";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
                 <Route element={<MainLayout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/venues/:id" element={<VenueDetails />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/venues/:id" element={<VenueDetails />} />
 
-                <Route element={<ProtectedRoute />}>
-                    <Route
-                        path="/my-bookings"
-                        element={<MyBookings />}
-                    />
+                    <Route element={<ProtectedRoute />}>
+                        <Route
+                            path="/my-bookings"
+                            element={<MyBookings />}
+                        />
                     </Route>
-                </Route>
 
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/my-bookings" element={<MyBookings />} />
-                </Route>
-
-                <Route element={<ProtectedRoute requiredRole="VenueOwner" />}>
-                    <Route
-                        path="/venue-owner"
-                        element={<VenueOwnerDashboard />}
-                    />
-                </Route>
-
-                <Route element={<ProtectedRoute requiredRole="VenueOwner" />}>
-                    <Route
-                        path="/venue-owner"
-                        element={<VenueOwnerDashboard />}
-                    />
-
-                    <Route
-                        path="/venue-owner/venues/create"
-                        element={<CreateVenue />}
-                    />
+                    <Route element={<ProtectedRoute requiredRole="VenueOwner" />}>
+                        <Route
+                            path="/venue-owner"
+                            element={<VenueOwnerDashboard />}
+                        />
+                        <Route
+                            path="/venue-owner/venues/create"
+                            element={<CreateVenue />}
+                        />
+                        <Route
+                            path="/venue-owner/venues/:id/courts"
+                            element={<ManageVenueCourts />}
+                        />
+                    </Route>
                 </Route>
             </Routes>
         </BrowserRouter>

@@ -31,6 +31,7 @@ export default function VenueOwnerDashboard() {
             <Link to="/venue-owner/venues/create">
                 Create Venue
             </Link>
+
             <h1>My Venues</h1>
 
             {venues.length === 0 ? (
@@ -39,12 +40,20 @@ export default function VenueOwnerDashboard() {
                 venues.map((venue) => (
                     <div key={venue.id}>
                         <h2>{venue.name}</h2>
+
                         <p>{venue.description}</p>
                         <p>{venue.address}</p>
+
                         <p>
                             Booking duration:{" "}
                             {venue.bookingDurationMinutes} minutes
                         </p>
+
+                        <Link
+                            to={`/venue-owner/venues/${venue.id}/courts`}
+                        >
+                            Manage Courts
+                        </Link>
                     </div>
                 ))
             )}

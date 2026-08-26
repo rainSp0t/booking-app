@@ -36,3 +36,9 @@ export async function createVenue(venueData) {
 
     return response.data;
 }
+
+export async function createCourt(courtData) {
+    const response = await apiClient.post("/courts", courtData);
+
+    return response.data;
+}

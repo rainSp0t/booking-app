@@ -9,13 +9,11 @@ export async function login(email, password) {
     return response.data;
 }
 
-export async function register(name, email, password, role) {
-    const response = await apiClient.post("/auth/register", {
-        name,
-        email,
-        password,
-        role
-    });
+export async function register(userData) {
+    const response = await apiClient.post(
+        "/users/register",
+        userData
+    );
 
     return response.data;
 }

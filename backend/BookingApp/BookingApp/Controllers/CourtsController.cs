@@ -101,6 +101,27 @@ public class CourtsController : ControllerBase
 
         var closingTime = date.Date + openingHours.CloseTime;
 
+
+        if (date.Date == DateTime.Today)
+        {
+            var now = DateTime.Now;
+
+            if (currentSlot < now)
+            {
+                var elapsedMinutes = (int)(now - currentSlot).TotalMinutes;
+
+                var durationMinutes = court.Venue!.BookingDurationMinutes;
+
+                var periods = (elapsedMinutes + durationMinutes - 1)
+                    / durationMinutes;
+
+                currentSlot = currentSlot.AddMinutes(
+                    periods * durationMinutes
+                );
+            }
+        }
+
+
         var slotDuration = TimeSpan.FromMinutes(
             court.Venue!.BookingDurationMinutes
         );

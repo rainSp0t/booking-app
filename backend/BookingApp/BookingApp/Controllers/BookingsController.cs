@@ -36,6 +36,15 @@ public class BookingsController : ControllerBase
             return NotFound("Court not found.");
         }
 
+
+        if (dto.StartTime <= DateTime.Now)
+        {
+            return BadRequest(
+                "Cannot create a booking for a time that has already started."
+            );
+        }
+
+
         var openingHours = _context.OpeningHours.FirstOrDefault(
             oh =>
                 oh.VenueId == court.VenueId &&

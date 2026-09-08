@@ -4,14 +4,11 @@ import {
     getVenueById,
     getCourtAvailability
 } from "../services/venueService";
-import { createBooking } from "../services/bookingService";
-import { useAuth } from "../context/AuthContext";
 import BookingCalendar from "../components/BookingCalendar";
 import {
     useNavigate,
     useLocation
 } from "react-router-dom";
-
 
 export default function VenueDetails() {
     const { id } = useParams();
@@ -24,7 +21,6 @@ export default function VenueDetails() {
     const [availability, setAvailability] = useState([]);
 
     const [selectedSlot, setSelectedSlot] = useState(null);
-    const { isAuthenticated } = useAuth();
 
     const [bookingError, setBookingError] = useState("");
     const [bookingSuccess, setBookingSuccess] = useState("");
@@ -38,6 +34,10 @@ export default function VenueDetails() {
                 const data = await getVenueById(id);
 
                 setVenue(data);
+
+                if (data.courts.length > 0) {
+                    setSelectedCourt(data.courts[0].id);
+                }
             } catch (error) {
                 console.error("Failed to load venue:", error);
 
@@ -60,34 +60,32 @@ export default function VenueDetails() {
         }
     }, [location.state]);
 
-    
     useEffect(() => {
-    async function loadAvailability() {
-        if (!selectedCourt || !selectedDate) {
-            setAvailability([]);
-            return;
+        async function loadAvailability() {
+            if (!selectedCourt || !selectedDate) {
+                setAvailability([]);
+                return;
+            }
+
+            try {
+                const data = await getCourtAvailability(
+                    selectedCourt,
+                    selectedDate
+                );
+
+                setAvailability(data);
+            } catch (error) {
+                console.error(
+                    "Failed to load availability:",
+                    error
+                );
+
+                setAvailability([]);
+            }
         }
-
-        try {
-            const data = await getCourtAvailability(
-                selectedCourt,
-                selectedDate
-            );
-
-            setAvailability(data);
-        } catch (error) {
-            console.error(
-                "Failed to load availability:",
-                error
-            );
-
-            setAvailability([]);
-        }
-    }
 
         loadAvailability();
     }, [selectedCourt, selectedDate]);
-
 
     useEffect(() => {
         if (!bookingSuccess) {
@@ -100,53 +98,6 @@ export default function VenueDetails() {
 
         return () => clearTimeout(timer);
     }, [bookingSuccess]);
-
-
-
-    async function handleBooking() {
-        if (!selectedSlot || !selectedCourt) {
-            return;
-        }
-
-        if (!isAuthenticated) {
-            setBookingError("You must be logged in to make a booking.");
-            return;
-        }
-
-        setBookingError("");
-        setBookingSuccess("");
-        setIsBooking(true);
-
-        try {
-            await createBooking(
-                selectedCourt,
-                selectedSlot.startTime,
-                selectedSlot.endTime
-            );
-
-            setBookingSuccess("Booking created successfully.");
-            setSelectedSlot(null);
-
-            // Refresh availability so the newly booked slot
-            // becomes unavailable.
-            const updatedAvailability = await getCourtAvailability(
-                selectedCourt,
-                selectedDate
-            );
-
-            setAvailability(updatedAvailability);
-        } catch (error) {
-            console.error("Failed to create booking:", error);
-
-            setBookingError(
-                error.response?.data || "Failed to create booking."
-            );
-        } finally {
-            setIsBooking(false);
-        }
-    }
-
-
 
     if (error) {
         return <p>{error}</p>;
@@ -164,6 +115,13 @@ export default function VenueDetails() {
             return dayA - dayB;
         }
     );
+
+    const visibleAvailability = availability.filter((slot) => {
+        const now = new Date();
+        const startTime = new Date(slot.startTime);
+
+        return startTime > now;
+    });
 
     return (
         <div className="venue-details-page">
@@ -213,6 +171,7 @@ export default function VenueDetails() {
                                 onClick={() => {
                                     setSelectedCourt(court.id);
                                     setSelectedSlot(null);
+                                    setAvailability([]);
                                 }}
                             >
                                 {selectedCourt === court.id
@@ -236,6 +195,7 @@ export default function VenueDetails() {
                         onDateSelect={(date) => {
                             setSelectedDate(date);
                             setSelectedSlot(null);
+                            setBookingError("");
                         }}
                     />
                 </div>
@@ -244,13 +204,13 @@ export default function VenueDetails() {
                     <div className="availability-section">
                         <h3>Available Times</h3>
 
-                        {availability.length === 0 ? (
+                        {visibleAvailability.length === 0 ? (
                             <p className="empty-message">
-                                No availability found for this date.
+                                No available times found for this date.
                             </p>
                         ) : (
                             <div className="availability-grid">
-                                {availability.map((slot) => {
+                                {visibleAvailability.map((slot) => {
                                     const start = new Date(
                                         slot.startTime
                                     ).toLocaleTimeString([], {
@@ -266,7 +226,8 @@ export default function VenueDetails() {
                                     });
 
                                     const isSelected =
-                                        selectedSlot?.startTime === slot.startTime;
+                                        selectedSlot?.startTime ===
+                                        slot.startTime;
 
                                     return (
                                         <button
@@ -276,9 +237,15 @@ export default function VenueDetails() {
                                                 slot.available
                                                     ? "available"
                                                     : "booked"
-                                            } ${isSelected ? "selected" : ""}`}
+                                            } ${
+                                                isSelected
+                                                    ? "selected"
+                                                    : ""
+                                            }`}
                                             disabled={!slot.available}
-                                            onClick={() => setSelectedSlot(slot)}
+                                            onClick={() =>
+                                                setSelectedSlot(slot)
+                                            }
                                         >
                                             <span className="slot-time">
                                                 {start}
@@ -310,7 +277,12 @@ export default function VenueDetails() {
                         <p>
                             {new Date(
                                 selectedSlot.startTime
-                            ).toLocaleDateString()}
+                            ).toLocaleDateString(undefined, {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric"
+                            })}
                         </p>
 
                         <p>
@@ -342,8 +314,10 @@ export default function VenueDetails() {
                                             (court) =>
                                                 court.id === selectedCourt
                                         )?.name,
-                                        startTime: selectedSlot.startTime,
-                                        endTime: selectedSlot.endTime
+                                        startTime:
+                                            selectedSlot.startTime,
+                                        endTime:
+                                            selectedSlot.endTime
                                     }
                                 })
                             }
@@ -358,8 +332,6 @@ export default function VenueDetails() {
                         {bookingError}
                     </p>
                 )}
-
-                
             </section>
 
             <section className="venue-section opening-hours-section">
@@ -409,11 +381,14 @@ export default function VenueDetails() {
             </section>
 
             {bookingSuccess && (
-                <div className="success-toast" role="status">
+                <div
+                    className="success-toast"
+                    role="status"
+                >
                     <span>✓</span>
                     <span>{bookingSuccess}</span>
                 </div>
             )}
         </div>
-    ); 
+    );
 }

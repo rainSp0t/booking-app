@@ -6,8 +6,11 @@ import {
 } from "../services/venueService";
 import { createBooking } from "../services/bookingService";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import BookingCalendar from "../components/BookingCalendar";
+import {
+    useNavigate,
+    useLocation
+} from "react-router-dom";
 
 
 export default function VenueDetails() {
@@ -25,9 +28,9 @@ export default function VenueDetails() {
 
     const [bookingError, setBookingError] = useState("");
     const [bookingSuccess, setBookingSuccess] = useState("");
-    const [isBooking, setIsBooking] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         async function loadVenue() {
@@ -44,6 +47,18 @@ export default function VenueDetails() {
 
         loadVenue();
     }, [id]);
+
+    useEffect(() => {
+        if (location.state?.bookingSuccess) {
+            setBookingSuccess("Booking created successfully.");
+
+            window.history.replaceState(
+                {},
+                document.title,
+                window.location.pathname
+            );
+        }
+    }, [location.state]);
 
     
     useEffect(() => {
@@ -316,12 +331,24 @@ export default function VenueDetails() {
 
                         <button
                             type="button"
-                            onClick={handleBooking}
-                            disabled={isBooking}
+                            className="primary-button"
+                            onClick={() =>
+                                navigate("/payment", {
+                                    state: {
+                                        venueId: venue.id,
+                                        venueName: venue.name,
+                                        courtId: selectedCourt,
+                                        courtName: venue.courts.find(
+                                            (court) =>
+                                                court.id === selectedCourt
+                                        )?.name,
+                                        startTime: selectedSlot.startTime,
+                                        endTime: selectedSlot.endTime
+                                    }
+                                })
+                            }
                         >
-                            {isBooking
-                                ? "Booking..."
-                                : "Confirm Booking"}
+                            Continue to Payment
                         </button>
                     </div>
                 )}

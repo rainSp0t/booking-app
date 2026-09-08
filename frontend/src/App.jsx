@@ -13,25 +13,43 @@ import ManageVenueCourts from "./pages/ManageVenueCourts";
 import ManageOpeningHours from "./pages/ManageOpeningHours";
 import ManageVenueBookings from "./pages/ManageVenueBookings";
 import OwnedVenueRoute from "./components/OwnedVenueRoute";
+import Payment from "./pages/Payment";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
                 <Route element={<MainLayout />}>
+                    {/* Public routes */}
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-                    <Route path="/venues/:id" element={<VenueDetails />} />
+                    <Route
+                        path="/venues/:id"
+                        element={<VenueDetails />}
+                    />
 
+                    {/* Authenticated user routes */}
                     <Route element={<ProtectedRoute />}>
                         <Route
                             path="/my-bookings"
                             element={<MyBookings />}
                         />
+
+                        <Route
+                            path="/payment"
+                            element={<Payment />}
+                        />
                     </Route>
 
-                    <Route element={<ProtectedRoute requiredRole="VenueOwner" />}>
+                    {/* Venue Owner routes */}
+                    <Route
+                        element={
+                            <ProtectedRoute
+                                requiredRole="VenueOwner"
+                            />
+                        }
+                    >
                         <Route
                             path="/venue-owner"
                             element={<VenueOwnerDashboard />}
@@ -42,6 +60,7 @@ function App() {
                             element={<CreateVenue />}
                         />
 
+                        {/* Only owners of the specific venue */}
                         <Route element={<OwnedVenueRoute />}>
                             <Route
                                 path="/venue-owner/venues/:id/courts"
